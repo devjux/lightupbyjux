@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Light Up Lancaster 2026 – Friends’ Guide</title>
+<meta name="theme-color" content="#12102b">
+<style>
+:root{
+  --bg:#12102b; --card:#1d1a40; --line:#34306a; --text:#f1efff; --muted:#b3afdc;
+  --star-off:#4a4580; --star-on:#ffd23f; --focus:#7ff5e0;
+  --cyber:#a24bd0; --castle:#8c7bd6; --fun:#17c3b2; --nature:#3fb950; --moor:#d46fc0; --water:#3b8fd9;
+}
+@media (prefers-color-scheme: light){
+  :root{--bg:#f4f2ff; --card:#fff; --line:#d9d4f5; --text:#1e1a47; --muted:#5b5690; --star-off:#cfc9ee; --star-on:#f0a500; --focus:#0a7d6f}
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:70px}
+body{margin:0;background:var(--bg);color:var(--text);font:17px/1.55 Georgia,"Iowan Old Style",serif;
+  padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+header{padding:28px 18px 8px;max-width:680px;margin:0 auto}
+h1{font-size:2rem;line-height:1.1;margin:0 0 6px;letter-spacing:-.01em}
+.sub{margin:0;color:var(--muted);font-family:system-ui,sans-serif;font-size:.95rem}
+.bar{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);
+  padding:10px 18px;font-family:system-ui,sans-serif}
+.bar-in{max-width:680px;margin:0 auto}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:.9rem}
+.track{height:8px;border-radius:4px;background:var(--line);margin-top:6px;overflow:hidden}
+.fill{height:100%;width:0;background:linear-gradient(90deg,var(--fun),var(--star-on));transition:width .3s}
+.toggle{display:flex;align-items:center;gap:6px;font-size:.85rem;color:var(--muted)}
+main{max-width:680px;margin:0 auto;padding:6px 14px 40px}
+.note{font-family:system-ui,sans-serif;font-size:.88rem;color:var(--muted);border-left:3px solid var(--water);padding:4px 0 4px 12px;margin:14px 4px}
+h2{font-size:1.15rem;margin:26px 4px 8px}
+h2 small{display:block;font:400 .85rem system-ui,sans-serif;color:var(--muted)}
+article{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--z);border-radius:10px;padding:14px 14px 12px;margin:0 0 12px;
+  box-shadow:0 0 18px -8px var(--z)}
+article.seen{opacity:.82}
+article.hide{display:none}
+h3{margin:0;font-size:1.2rem;line-height:1.25}
+.by{margin:2px 0 8px;font:.85rem system-ui,sans-serif;color:var(--muted)}
+p{margin:0 0 10px;font-size:.98rem}
+.warn{font:.82rem system-ui,sans-serif;color:var(--muted);background:var(--bg);padding:6px 9px;border-radius:6px;margin-bottom:10px}
+.ctl{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;font-family:system-ui,sans-serif;
+  border-top:1px solid var(--line);padding-top:10px}
+label.chk{display:flex;align-items:center;gap:8px;min-height:44px;cursor:pointer;font-size:.95rem}
+input[type=checkbox]{width:24px;height:24px;accent-color:var(--fun)}
+.stars{display:flex}
+.stars button{background:none;border:0;padding:0 2px;width:40px;height:44px;font-size:28px;line-height:1;color:var(--star-off);cursor:pointer}
+.stars button.on{color:var(--star-on)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+footer{max-width:680px;margin:0 auto;padding:0 18px 40px;font:.82rem system-ui,sans-serif;color:var(--muted)}
+footer button{font:inherit;color:var(--muted);background:none;border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin-top:10px;cursor:pointer}
+@media (prefers-reduced-motion:reduce){.fill{transition:none}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Light Up Lancaster 2026</h1>
+  <p class="sub">Thursday 5 – Saturday 7 November, 5pm–10pm. Tick what you’ve seen and rate it.</p>
+</header>
+<div class="bar"><div class="bar-in">
+  <div class="row"><span id="count" aria-live="polite">0 of 0 seen</span>
+    <label class="toggle"><input type="checkbox" id="onlyNew"> Hide seen</label></div>
+  <div class="track"><div class="fill" id="fill"></div></div>
+</div></div>
+<main id="list"></main>
+<footer>
+  Your ticks and ratings are saved only on this phone, so friends won’t see each other’s.
+  Details come from the official festival leaflet; check <a href="https://www.lightuplancaster.co.uk/about/whats-on-festival/" style="color:inherit">the festival site</a> for updates.<br>
+  <button id="reset">Clear my ticks and ratings</button>
+</footer>
+
+<script>
+const Z={cyber:'var(--cyber)',castle:'var(--castle)',fun:'var(--fun)',nature:'var(--nature)',moor:'var(--moor)',water:'var(--water)'};
+const GROUPS=[
+ {t:'The Storey',s:'Meeting House Lane',z:'cyber',items:[
+  {id:'duplication',n:'Duplication',a:'NA11',w:'The Gallery',d:'Portraits and voices of people connected to Lancaster become a large-scale projection. It asks what happens to our identities when technology can record, copy and manipulate them, and the line between real and artificial blurs. Inspired by cybersecurity research from Dr Justin Lo, Lancaster University.'},
+  {id:'zero-knowledge',n:'Zero Knowledge',a:'Ronan Devlin',w:'The Music Room',d:'An immersive, interactive piece where every visitor secretly adds words to a shared constellation. Together the anonymous contributions form fleeting visual poetry, showing how we can share a digital experience without giving up our identity. Inspired by research from Dr Zhipeng Wang, University of Manchester.'},
+  {id:'puddles',n:'Puddles',a:'idontloveyouanymore',w:'The Storey Gardens (access via The Storey)',d:'A new interactive artwork from the artists behind the waterfall at The Priory, the river on Church Street and the beating hearts in The Storey Gardens. Step into the puddles and your footsteps send waves of light across each one.'}]},
+ {t:'Lancaster Castle',z:'castle',items:[
+  {id:'sandcastle',n:'Sandcastle',a:'leo&hyde / 2099 Will Be Fine',w:'Projection on Lancaster Castle',d:'What if the castle were one huge sandcastle? A playful, funny projection with a soundtrack that sticks to you like sand. A reminder to enjoy every moment, because nothing we build lasts forever, and that’s no reason to stop building.'}]},
+ {t:'Lancaster Priory',z:'castle',items:[
+  {id:'dear-earthling',n:'Dear Earthling…',a:'imitating the dog with James Hamilton',w:'Lancaster Priory',d:'In 1997 astronaut Jerry Linenger left Earth and his baby son behind, and wrote a series of letters home. Festival favourites imitating the dog turn them into a projection show with live music, big visuals and live performance.'}]},
+ {t:'80 Church Street',z:'castle',items:[
+  {id:'street-aquarium',n:'Street Aquarium',a:'Marge Bradshaw',w:'80 Church Street',d:'A familiar building becomes a dreamlike underwater world, visible only after dark. Hundreds of hand-printed cyanotypes animate into ghostly fish that shimmer and drift past. Take a moment to slow down and watch.',warn:'Contains some flashing and strobing light effects.'}]},
+ {t:'Sun Square',z:'fun',items:[
+  {id:'demonz',n:'Demonz',a:'INITI Interactive: ARTshifters (Czech Republic)',w:'Sun Square',d:'Sun Square becomes a giant playground. Mischievous digital creatures flicker into being and dare you to knock them out with soft balls. Each hit explodes into light, colour and sound. Fast, funny and fleeting, for all ages.'}]},
+ {t:'Dalton Square',s:'Also home to the Big Wheel (ticketed) and the shuttle buses to Williamson Park',z:'fun',items:[
+  {id:'twist-shine',n:'Twist & Shine',a:'Kaleider',w:'Dalton Square',d:'Giant interactive glowing sculptures where every prism twists, so you can build them into whatever shape you like. Work together to move the pieces, or just watch others play.'},
+  {id:'pig-farm',n:'Pig Farm',a:'Ladislav Sutnar: ARTshifters (Czech Republic)',w:'Dalton Square',d:'A joyful herd of glowing, upcycled pigs made from discarded water barrels. Hop on to set them swaying, tap their backs and watch the light shift from soft white to vibrant pink.'}]},
+ {t:'Moor Space',z:'moor',items:[
+  {id:'noctilucent',n:'Noctilucent',a:'Nurul Wardani',w:'Moor Space',d:'An installation about how we sense volume in space through light, atmosphere and movement. Projected light in haze creates shifting forms, inspired by natural patterns and atmospheric phenomena. A Light Up The North SHINE artwork.'}]},
+ {t:'The Gregson',z:'moor',items:[
+  {id:'why-i-walk',n:'Why I Walk',a:'Ash Murphy, Lancashire Youth Challenge and Global Link DEC',w:'The Gregson',d:'Stories from around the world about migration, movement and the journeys that shape our lives. Projected imagery, recorded voices and an original musical score come together in a display of illuminated suitcases.'}]},
+ {t:'The canal walk',s:'A 5–10 minute walk from the city centre. Start at the White Cross pub and finish at the Waterwitch.',z:'water',items:[
+  {id:'damselflies',n:'Damselflies',a:'Rubbish Artist Tracey Graham',w:'White Cross, canal',d:'A response to how habitat loss, pollution and climate change affect our waterways. The damselfly, an endangered species in the UK, stands for the wider challenges facing our ecosystems.'},
+  {id:'fish-jumping',n:'Fish Are Jumping',a:'Studio Toer (Netherlands)',w:'The canal',d:'Splash. You look. Too late. Nope, there it goes. Splash. Yes, I saw it! An interpretation of the way fish sometimes catch our attention by leaping above the water, and an ode to life’s little surprises.'},
+  {id:'animals',n:'Animals',a:'Ivo Opl and Suren Manvelyan: ARTshifters (Czech Republic and Armenia)',w:'The canal',d:'Forty recycled smartphones hidden in the trees become the eyes of the wild. Animals react to you: stay quiet and a caiman’s gaze holds steady, get loud and it vanishes in a blink. A brief, watchful encounter with 16 species.'},
+  {id:'crystal-tide',n:'Crystal Tide',a:'Anne Bennett',w:'The Waterwitch, canal',d:'A mirrored lighthouse among towering crystal shards that glows with Northern Lights colours after dark. Reflections, sound and drifting mist reshape the landscape, inspired by melting ice caps and rising seas.'}]},
+ {t:'Moorlands Church',z:'castle',items:[
+  {id:'arc',n:'ARC',a:'Hannah and Dan Fox',w:'Moorlands Church courtyard',d:'Shadow carousels throw large-scale scenes around the courtyard walls, creating a fleeting folkloric parade. Fretwork cylinders turn to cast silhouettes of fabled imagery, nature motifs, mythical characters and circus scenes, with ephemeral sound following the stories.'}]},
+ {t:'Williamson Park',s:'Shuttle bus from Dalton Square, or a 15-minute uphill walk from Dalton Square and The Dukes. The Wyresdale Road car park has plenty of spaces, including disabled bays.',z:'nature',items:[
+  {id:'garden-of-shadows',n:'Garden of Shadows',a:'Jony Easterby',w:'Williamson Park, a trail of 9 artworks',d:'A trail of nine artworks filling the park with animated landscapes drawn from grassland and forest, hedgerows, bonsai trees given the gift of scale, woodland sprites and slow-motion flying creatures. Follow the trail through gentle electronic encounters with the natural world. The leaflet lists the nine artworks on its reverse.'}]}
+];
+const KEY='lul2026';
+let st={};try{st=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}};
+const all=GROUPS.flatMap(g=>g.items);
+const list=document.getElementById('list');
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+
+GROUPS.forEach(g=>{
+  const h=document.createElement('div');
+  h.innerHTML=`<h2>${esc(g.t)}</h2>`;
+  list.appendChild(h);
+  if(g.s){const n=document.createElement('p');n.className='note';n.textContent=g.s;list.appendChild(n)}
+  g.items.forEach(it=>{
+    const a=document.createElement('article');
+    a.id=it.id;a.style.setProperty('--z',Z[g.z]);
+    a.innerHTML=`<h3>${esc(it.n)}</h3><div class="by">${esc(it.a)} · ${esc(it.w)}</div>
+      <p>${esc(it.d)}</p>${it.warn?`<div class="warn">${esc(it.warn)}</div>`:''}
+      <div class="ctl"><label class="chk"><input type="checkbox"> Been here</label>
+      <div class="stars" role="group" aria-label="Rate ${esc(it.n)}">${[1,2,3,4,5].map(i=>`<button type="button" data-v="${i}" aria-label="${i} star${i>1?'s':''}">★</button>`).join('')}</div></div>`;
+    const box=a.querySelector('input'),btns=[...a.querySelectorAll('.stars button')];
+    const paint=()=>{const s=st[it.id]||{};box.checked=!!s.seen;a.classList.toggle('seen',!!s.seen);
+      btns.forEach(b=>{const on=+b.dataset.v<=(s.r||0);b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)});};
+    box.onchange=()=>{(st[it.id]=st[it.id]||{}).seen=box.checked;save();paint();upd()};
+    btns.forEach(b=>b.onclick=()=>{const s=st[it.id]=st[it.id]||{};const v=+b.dataset.v;s.r=s.r===v?0:v;if(s.r)s.seen=true;save();paint();upd()});
+    a._paint=paint;paint();list.appendChild(a);
+  });
+});
+
+function upd(){
+  const seen=all.filter(i=>(st[i.id]||{}).seen).length;
+  document.getElementById('count').textContent=`${seen} of ${all.length} seen`;
+  document.getElementById('fill').style.width=(seen/all.length*100)+'%';
+  const hide=document.getElementById('onlyNew').checked;
+  all.forEach(i=>{const a=document.getElementById(i.id);a.classList.toggle('hide',hide&&!!(st[i.id]||{}).seen)});
+}
+document.getElementById('onlyNew').onchange=upd;
+document.getElementById('reset').onclick=()=>{if(confirm('Clear all your ticks and ratings on this device?')){st={};save();document.querySelectorAll('article').forEach(a=>a._paint());upd()}};
+upd();
+</script>
+</body>
+</html>
